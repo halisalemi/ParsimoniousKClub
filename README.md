@@ -14,6 +14,11 @@ This code accompanies the paper "Parsimonious formulations for low-diameter clus
 
 Terms and conditions
 --------------------
+Please feel free to use these codes. We only ask that you cite:
+
+    Austin L. Buchanan and Hosseinali Salemi. Parsimonious formulations for low-diameter clusters.
+    
+
 Copyright (c) 2018 Austin L. Buchanan, Hosseinali Salemi. All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
