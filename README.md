@@ -14,7 +14,7 @@ note={Preprint available at \url{http://www.optimization-online.org/DB_HTML/2017
 
 Terms and conditions
 --------------------
-Copyright (c) 2018 Austin L. Buchanan and Hosseinali Salemi
+Copyright (c) 2018 Austin L. Buchanan, Hosseinali Salemi. All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
