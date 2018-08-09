@@ -1,7 +1,7 @@
 # ParsimoniousKClub
 This code accompanies the paper "Parsimonious formulations for low-diameter clusters" and is written in C++. If you want to use or cite this code, please cite the paper:   
 
-         %% @misc{buchanan2018,
+            @misc{buchanan2018,
             title={Parsimonious formulations for low-diameter clusters},
             author={Buchanan, Austin and Salemi, Hosseinali},
             year={2018},
