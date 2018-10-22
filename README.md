@@ -9,7 +9,7 @@ This code accompanies the paper "Parsimonious formulations for low-diameter clus
             } 
 
 
-Compiling thie code
+Compiling the code
 --------------------
 #### How to run the code for "Real-Life Instances (DIMACS-10)"
 
@@ -37,7 +37,7 @@ Compiling thie code
 6.7. To see the results for "CN+ formulation" where k=2, type " Kclub.exe CutLike dimacs [folder address of the instance] \ [name of instance].graph 2" and press Enter.
 
 
-#### How to run the code for "Synthetic instances "
+#### How to run the code for "Synthetic instances"
 
 1.0. Download all .cpp and .h files.
 
