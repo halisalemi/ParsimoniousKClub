@@ -85,12 +85,6 @@ int main(int argc, char *argv[])
 		bool subOpt;
 		vector<long> Optimal_Solution = solveMaxKClub_CutLike(g, k, DROP_Solution, subOpt);
 
-		/*KGraph g1 = g.CreateInducedGraph(Optimal_Solution);
-		for (long t = 0; t < g1.n; t++)
-		{
-		cerr << "it is : " << g1.degree[t] << endl;
-		}*/
-
 		// output solve info
 		if (!subOpt) cout << Optimal_Solution.size() << " " << (double)(clock() - start) / CLOCKS_PER_SEC << endl;
 		else cout << "? >3600" << endl;
