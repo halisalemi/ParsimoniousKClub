@@ -27,17 +27,17 @@ vector<long> HeuristicAndPreprocess(KGraph &g, long k)
 	vector<long> rd;  // right-degree of degeneracy ordering.
 	vector<long> degeneracyordering = gk.FindDegeneracyOrdering(rd);
 	vector<long> kclique = gk.FindHeuristicClique(degeneracyordering, rd);
-	cerr << "k-clique (heuristic) size is = " << kclique.size() << endl;
+	//cerr << "k-clique (heuristic) size is = " << kclique.size() << endl;
 
 	// perform DROP heuristic, with kclique as starting point.
 	vector<bool> HeuristicSolution = boolify(kclique, g.n); // make the heuristic kclique into a boolean form
 	vector<long> DROP_Solution = DROP(g, HeuristicSolution, k);
 	long lb = DROP_Solution.size();
-	cerr << "Drop heuristic gives LB = " << lb << endl;
+	//cerr << "Drop heuristic gives LB = " << lb << endl;
 
 	// perform preprocessing
 	vector<long> kcorevertices = gk.FindVerticesOfKCore(degeneracyordering, rd, lb - 1);
-	cerr << "Preprocessed instances has this many vertices = " << kcorevertices.size() << endl;
+	//cerr << "Preprocessed instances has this many vertices = " << kcorevertices.size() << endl;
 	g.FindInducedGraph(kcorevertices);
 
 	return DROP_Solution;
@@ -351,8 +351,8 @@ vector<long> solve2Club(KGraph &g, long k, vector<long> &HeuristicSolution, bool
 		GRBEnv env = GRBEnv();
 		env.set(GRB_IntParam_OutputFlag, 0);
 		env.set(GRB_DoubleParam_TimeLimit, 3600);
+		env.set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBModel model = GRBModel(env);
-		model.getEnv().set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBVar *X = model.addVars(g.n, GRB_BINARY);
 		GRBVar *Y = model.addVars(components.size(), GRB_BINARY);
 		model.update();
@@ -409,7 +409,7 @@ vector<long> solve2Club(KGraph &g, long k, vector<long> &HeuristicSolution, bool
 				}
 			}
 		}
-
+			 
 		// Adding \sigma_i y_i <= 1 constraints.
 		GRBLinExpr expr = 0;
 		for (long i = 0; i < components.size(); i++)
@@ -457,7 +457,8 @@ vector<long> solve2Club(KGraph &g, long k, vector<long> &HeuristicSolution, bool
 	return S;
 }
 
-vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSolution, bool &subOpt)
+
+vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSolution, bool &subOpt, long v_i)
 {
 	vector<long> S;
 	subOpt = true;
@@ -471,9 +472,9 @@ vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSol
 		GRBEnv env = GRBEnv();
 		env.set(GRB_IntParam_OutputFlag, 0);
 		env.set(GRB_DoubleParam_TimeLimit, 3600);
+		env.set(GRB_IntParam_LazyConstraints, 1);
+		env.set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBModel model = GRBModel(env);
-		model.getEnv().set(GRB_IntParam_LazyConstraints, 1);
-		model.getEnv().set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBVar *X = model.addVars(g.n, GRB_BINARY);
 		GRBVar *Y = model.addVars(components.size(), GRB_BINARY);
 		model.update();
@@ -543,6 +544,9 @@ vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSol
 				model.addConstr(X[v] <= Y[i]);
 			}
 		}
+
+		if (v_i >= 0) model.addConstr(X[v_i] == 1);
+
 		model.update();
 
 
@@ -551,20 +555,29 @@ vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSol
 		model.setCallback(&cb);
 
 		// Providing initial solution
-		for (long i = 0; i<g.n; i++)
-			X[i].set(GRB_DoubleAttr_Start, 0);
-
-		for (long i = 0; i < HeuristicSolution.size(); i++)
+		if (HeuristicSolution.size() > 0)
 		{
-			long v = HeuristicSolution[i];
-			X[v].set(GRB_DoubleAttr_Start, 1);
-		}
+			for (long i = 0; i<g.n; i++)
+				X[i].set(GRB_DoubleAttr_Start, 0);
 
+			for (long i = 0; i < HeuristicSolution.size(); i++)
+			{
+				long v = HeuristicSolution[i];
+				X[v].set(GRB_DoubleAttr_Start, 1);
+			}
+		}
+		
 		model.optimize();
 
-		long bestLB = model.get(GRB_DoubleAttr_ObjVal);
-		long bestUB = model.get(GRB_DoubleAttr_ObjBound);
-		cout << bestLB << " " << bestUB << " ";
+		
+		double LB = model.get(GRB_DoubleAttr_ObjVal);
+		double UB = model.get(GRB_DoubleAttr_ObjBound);
+		//cout << "LB = " << LB << ", UB =  " << UB << " ";
+
+		long NumOfBandBNodes = (long)model.get(GRB_DoubleAttr_NodeCount);
+		//cerr << "# B&B nodes = " << NumOfBandBNodes << endl;
+		//cerr << "# callbacks = " << Kclub_callback::numCallbacks << endl;
+		//cerr << "# lazy cuts = " << Kclub_callback::numLazyCuts << endl;
 
 		int status = model.get(GRB_IntAttr_Status);
 		if (status == GRB_OPTIMAL)
@@ -577,11 +590,6 @@ vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSol
 
 		delete[] X;
 
-		long NumOfBandBNodes = (long)model.get(GRB_DoubleAttr_NodeCount);
-		cerr << "# B&B nodes = " << NumOfBandBNodes << endl;
-		cerr << "# callbacks = " << Kclub_callback::numCallbacks << endl;
-		cerr << "# lazy cuts = " << Kclub_callback::numLazyCuts << endl;
-
 	}
 
 	catch (GRBException e) {
@@ -592,6 +600,61 @@ vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSol
 		cout << "Error during optimization" << endl;
 	}
 	return S;
+}
+
+vector<long> solveMaxKClub_CutLike(KGraph &g, long k, vector<long> &HeuristicSolution, bool &subOpt)
+{
+	return solveMaxKClub_CutLike(g, k, HeuristicSolution, subOpt, -1);
+}
+
+
+vector<long> solveMaxKClub_CutLike(KGraph &g, long k, long v)
+{
+	vector<long> empty;
+	bool subOpt;
+	return solveMaxKClub_CutLike(g, k, empty, subOpt,v);
+}
+
+
+long ICUT(KGraph &g, long k, vector<long> &BestKClub)
+{
+	long LB = BestKClub.size();
+	KGraph gk = g.CreatePowerGraph(k);
+
+	vector<long> degeneracyordering = gk.FindDegeneracyOrdering();
+	vector<bool> T(g.n, false);
+
+	for (long i = g.n - 1; i >= 0; i--)
+	{
+		vector<long> SubproblemVertices;
+
+		long v = degeneracyordering[i];
+		T[v] = true;
+		vector<long> dist_from_v = g.ShortestPathsUnweighted(v, T);
+
+		for (long j = 0; j < g.n; j++)
+			if (dist_from_v[j] <= k)
+				SubproblemVertices.push_back(j);
+
+		if (SubproblemVertices.size() <= LB) continue;
+
+		vector<long> Rmap;
+		KGraph g_subproblem = g.CreateInducedGraph(SubproblemVertices,Rmap);
+
+		vector<long> SubproblemSolution = solveMaxKClub_CutLike(g_subproblem, k, Rmap[v]);
+		if (SubproblemSolution.size() > LB)
+		{
+			LB = SubproblemSolution.size();
+			BestKClub = SubproblemSolution;
+			for (long q = 0; q < LB; q++)
+			{
+				long v = BestKClub[q];
+				long w = SubproblemVertices[v];
+				BestKClub[q] = w;
+			}
+		}
+	}
+	return LB;
 }
 
 
@@ -618,9 +681,8 @@ vector<long> MaxKclubRevisedVeremyevFormulation(KGraph &g1, long s, vector<long>
 		env.set(GRB_IntParam_Method, 3);  // use barrier method to solve LP relaxation, since highly degenerate.
 										  //env.set(GRB_IntParam_OutputFlag,0); // same as cplex.getNullStream();
 		env.set(GRB_DoubleParam_TimeLimit, 3600);
+		env.set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBModel model = GRBModel(env);
-		model.getEnv().set(GRB_DoubleParam_MIPGap, 0.0);
-
 		GRBVar *X = model.addVars(g.n, GRB_BINARY);
 		GRBVar ***Y = new GRBVar**[g.n];   // Y[i][j][k] denotes whether there is a path from i to j of length k+1 (in the solution)
 		for (long i = 0; i<g.n; i++)
@@ -781,9 +843,9 @@ vector<long> solveMaxClubCHC(KGraph &g, long k, vector<long> &HeuristicSolution,
 		GRBEnv env = GRBEnv();
 		env.set(GRB_IntParam_OutputFlag, 0);
 		env.set(GRB_DoubleParam_TimeLimit, 3600);
+		env.set(GRB_IntParam_LazyConstraints, 1);
+		env.set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBModel model = GRBModel(env);
-		model.getEnv().set(GRB_IntParam_LazyConstraints, 1);
-		model.getEnv().set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBVar *X = model.addVars(g.n, GRB_BINARY);
 		GRBVar *Y = model.addVars(components.size(), GRB_BINARY);
 		model.update();
@@ -876,6 +938,10 @@ vector<long> solveMaxClubCHC(KGraph &g, long k, vector<long> &HeuristicSolution,
 		long bestUB = model.get(GRB_DoubleAttr_ObjBound);
 		cout << bestLB << " " << bestUB << " ";
 
+		long NumOfBandBNodes = (long)model.get(GRB_DoubleAttr_NodeCount);
+		cerr << "# B&B Nodes = " << NumOfBandBNodes << endl;
+		cerr << "# callbacks = " << CHC::numCallbacks << endl;
+
 		int status = model.get(GRB_IntAttr_Status);
 		if (status == GRB_OPTIMAL)
 			subOpt = false;
@@ -886,10 +952,6 @@ vector<long> solveMaxClubCHC(KGraph &g, long k, vector<long> &HeuristicSolution,
 				S.push_back(i);
 
 		delete[] X;
-
-		long NumOfBandBNodes = (long)model.get(GRB_DoubleAttr_NodeCount);
-		cerr << "# B&B Nodes = " << NumOfBandBNodes << endl;
-		cerr << "# callbacks = " << CHC::numCallbacks << endl;
 	}
 	catch (GRBException e) {
 		cout << "Error code = " << e.getErrorCode() << endl;
@@ -922,10 +984,10 @@ vector<long> Pathlike_3Club(KGraph &g, vector<long> &hsoln, bool &subOpt)
 		long start_formulation_creation = clock();
 
 		GRBEnv env = GRBEnv();
-		env.set(GRB_IntParam_OutputFlag, 0);
+		//env.set(GRB_IntParam_OutputFlag, 0);
 		env.set(GRB_DoubleParam_TimeLimit, 3600);
+		env.set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBModel model = GRBModel(env);
-		model.getEnv().set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBVar *X = model.addVars(g.n, GRB_BINARY);
 		GRBVar *Y = model.addVars(components.size(), GRB_BINARY);
 		GRBVar *Z = model.addVars(map.size(), GRB_BINARY);
@@ -1061,7 +1123,6 @@ vector<long> Pathlike_3Club(KGraph &g, vector<long> &hsoln, bool &subOpt)
 		long bestUB = model.get(GRB_DoubleAttr_ObjBound);
 		cout << bestLB << " " << bestUB << " ";
 
-
 		long NumBBNodes = (long)model.get(GRB_DoubleAttr_NodeCount);
 		cerr << "# B&B nodes = " << NumBBNodes << endl;
 
@@ -1112,7 +1173,7 @@ vector<long> Pathlike_4Club(KGraph &g, vector<long> &hsoln, bool &subOpt)
 		env.set(GRB_DoubleParam_TimeLimit, 3600);
 		GRBModel model = GRBModel(env);
 		//model.getEnv().set(GRB_IntParam_LazyConstraints, 1);
-		model.getEnv().set(GRB_DoubleParam_MIPGap, 0.0);
+		env.set(GRB_DoubleParam_MIPGap, 0.0);
 		GRBVar *X = model.addVars(g.n, GRB_BINARY);
 		GRBVar *Y = model.addVars(components.size(), GRB_BINARY);
 		GRBVar *Z = model.addVars(map1.size(), GRB_CONTINUOUS);
