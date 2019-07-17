@@ -21,6 +21,8 @@ int main(int argc, char *argv[])
 
 	if (argc<2)
 		cerr << "ERROR: Not enough arguments.";
+
+
 	else if (strcmp(argv[1], "Preprocess") == 0)  // only does the heuristic and preprocessing. Used to make table in paper.
 	{
 		// read the input graph g and the value for k
@@ -67,8 +69,6 @@ int main(int argc, char *argv[])
 		cerr << "Is it actually a k-club? " << g.IsKClub(Optimal_Solution, k);
 	}
 
-
-
 	// Our main method
 	else if (strcmp(argv[1], "CutLike") == 0)
 	{
@@ -76,13 +76,13 @@ int main(int argc, char *argv[])
 		KGraph g(argv[3], argv[3], argv[2]);
 		long k = atol(argv[4]);
 		cout << g.name << " " << k << " " << g.n << " ";
-
 		// start the timer and do heuristic & preprocessing
 		time_t start = clock();
 		vector<long> DROP_Solution = HeuristicAndPreprocess(g, k);
 
 		// solve max k-club using the cut-like formulation
 		bool subOpt;
+
 		vector<long> Optimal_Solution = solveMaxKClub_CutLike(g, k, DROP_Solution, subOpt);
 
 		// output solve info
@@ -100,6 +100,28 @@ int main(int argc, char *argv[])
 		}
 		cerr << "Is it actually a k-club? " << g.IsKClub(Optimal_Solution, k);
 	}
+
+
+	// Applying cut-like formulation iteratively. 
+	else if (strcmp(argv[1], "ICUT") == 0)
+	{
+		KGraph g(argv[3], argv[3], argv[2]);
+		long k = atol(argv[4]);
+
+		time_t start = clock();
+
+		vector<long> BestKClub = HeuristicAndPreprocess(g, k);
+		long MaxKClubSize = ICUT(g, k, BestKClub);
+
+		cout << "Total time = " << (double)(clock() - start) / CLOCKS_PER_SEC << endl;
+		cerr << "# nodes in " << k << "club = " << MaxKClubSize << endl;
+		cerr << "Maximum " << k << "club nodes are: ";
+		for (long i = 0; i < MaxKClubSize; i++)
+			cerr << BestKClub[i] << " ";
+		cerr << endl;
+		cerr << "Is it actually a k-club? " << g.IsKClub(BestKClub, k);
+	}
+
 
 	//3clubpathlike
 	else if (strcmp(argv[1], "3ClubPathLike") == 0)
