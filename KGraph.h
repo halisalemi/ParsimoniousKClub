@@ -77,6 +77,7 @@ public:
 	KGraph CreatePowerGraph(long s);
 	vector<long> FindHeuristicClique(vector<long> &degeneracyorder, vector<long> &rightdegree);
 	vector<long> FindDegeneracyOrdering(vector<long> &rightdegree);
+	vector<long> FindDegeneracyOrdering();
 	vector<long> FindVerticesOfKCore(vector<long> &degeneracyorder, vector<long> &rightdegree, long k);
 
 	bool IsKClub(vector<bool> &S, long k);
