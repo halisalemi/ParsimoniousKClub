@@ -626,8 +626,14 @@ vector<long> KGraph::FindDegeneracyOrdering(vector<long> &rightdegree)
 			}
 		}
 	}
-	cerr << "\n Degeneracy = " << degeneracy << endl;
+	//cerr << "\n Degeneracy = " << degeneracy << endl;
 	return vert;
+}
+
+vector<long> KGraph::FindDegeneracyOrdering()
+{
+	vector<long> rightdegree;
+	return FindDegeneracyOrdering(rightdegree);
 }
 
 vector<long> KGraph::FindVerticesOfKCore(vector<long> &degeneracyorder, vector<long> &rightdegree, long k)
