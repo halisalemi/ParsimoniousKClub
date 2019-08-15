@@ -98,29 +98,55 @@ vector<long> KGraph::ShortestPathsUnweighted(long origin)
 	vector<bool> S(n, true);
 	return ShortestPathsUnweighted(origin, S);
 }
+
+
 vector<long> KGraph::ShortestPathsUnweighted(long origin, vector<bool> &S)
 {
-	/*Finds the shortest paths from node v to all other nodes in graph G[S].
-	Assumes the graph is connected.
-	Performs BFS.*/
+	vector<long> D;
+	D.push_back(origin);
+	return MultiSourceShortestPaths(D, S);
+}
+
+
+vector<long> KGraph::MultiSourceShortestPaths(vector<long> &D)
+{
+	vector<bool> S(n, true);
+	return MultiSourceShortestPaths(D, S);
+}
+
+
+vector<long> KGraph::MultiSourceShortestPaths(vector<long> &D, vector<bool> &S)
+{
+	/*Finds the shortest paths from node v to set D.*/
 	long u, v;
-	vector<long> dist(n, n); //shortest distance from origin node to each other node. dist[i] = n means i not reachable
-	if (!S[origin]) return dist;  // if origin not in S, return infinities.
+	vector<long> dist(n, n);
 	vector<bool> reached(n, false);
 	vector<long> children, parents;
+	bool status = false;
 
-	children.push_back(origin);
-	dist[origin] = 0; //the origin node is distance 0 from itself
-	reached[origin] = true;
+	for (long i = 0; i < D.size(); i++)
+	{
+		if (S[D[i]]) status = true;
+		else continue;
+		children.push_back(D[i]);
+		dist[D[i]] = 0;
+		reached[D[i]] = true;
+	}
 
-	for (long d = 1; !children.empty(); d++) { //for each distance
+	if (!status) return dist; // if none of sources are in S, return infinities.
+
+	for (long d = 1; !children.empty(); d++)
+	{
 		parents = children;
 		children.clear();
-		for (long i = 0; i<parents.size(); i++) { //for each parent, examine the children
+		for (long i = 0; i < parents.size(); i++)
+		{
 			u = parents[i];
-			for (long j = 0; j<degree[u]; j++) {
+			for (long j = 0; j < degree[u]; j++)
+			{
 				v = adj[u][j];
-				if (!reached[v] && S[v]) {
+				if (!reached[v] && S[v])
+				{
 					reached[v] = true;
 					dist[v] = d;
 					children.push_back(v);
@@ -130,6 +156,8 @@ vector<long> KGraph::ShortestPathsUnweighted(long origin, vector<bool> &S)
 	}
 	return dist;
 }
+
+
 long KGraph::LongestShortestPathUnweighted(long origin)
 {
 	vector<long> SP = ShortestPathsUnweighted(origin);
