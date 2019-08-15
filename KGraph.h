@@ -24,6 +24,9 @@ public:
 	long LongestShortestPathUnweighted(long origin);
 	vector<long> ShortestPathsUnweighted(long origin);
 	vector<long> ShortestPathsUnweighted(long origin, vector<bool> &S);
+	vector<long> MultiSourceShortestPaths(vector<long> &D);
+	vector<long> MultiSourceShortestPaths(vector<long> &D, vector<bool> &S);
+
 	bool DeleteNode(long i);
 
 	vector<long> *adj;  // stores the adj lists. Each list is maintained as a sorted vector.
