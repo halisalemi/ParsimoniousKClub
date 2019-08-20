@@ -37,8 +37,6 @@ Compiling the code
 
 6.7. To see the results for "CN formulation" where k=2, type " Kclub.exe S2 dimacs [folder address of the instance] \ [name of instance].graph" and press Enter.
 
-6.8. To see the results for "CN+ formulation" where k=2, type " Kclub.exe CutLike dimacs [folder address of the instance] \ [name of instance].graph 2" and press Enter.
-
 
 #### How to run the code for "Synthetic instances"
 
