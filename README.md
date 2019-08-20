@@ -56,11 +56,9 @@ Compiling the code
 
 6.3. To see the results for "Cut-like formulation", type " Kclub.exe CutLike snap_d [folder address of the instance] \ [name of instance].txt [value of k] " and press Enter. 
 
-6.4. To see the results for "ICUT", type " Kclub.exe ICUT snap_d [folder address of the instance] \ [name of instance].txt [value of k] " and press Enter. 
+6.4. To see the results for "Path-like formulation" where k=3, type " Kclub.exe 3ClubPathLike snap_d [folder address of the instance] \ [name of instance].txt " and press Enter. 
 
-6.5. To see the results for "Path-like formulation" where k=3, type " Kclub.exe 3ClubPathLike snap_d [folder address of the instance] \ [name of instance].txt " and press Enter. 
-
-6.6. To see the results for "Path-like formulation" where k=4, type " Kclub.exe 4ClubPathLike snap_d [folder address of the instance] \ [name of instance].txt " and press Enter. 
+6.5. To see the results for "Path-like formulation" where k=4, type " Kclub.exe 4ClubPathLike snap_d [folder address of the instance] \ [name of instance].txt " and press Enter. 
 
 
 
