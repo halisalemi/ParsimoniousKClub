@@ -1,12 +1,14 @@
 # ParsimoniousKClub
 This code accompanies the paper "Parsimonious formulations for low-diameter clusters" and is written in C++. If you want to use or cite this code, please cite the paper:   
 
-            @misc{buchanan2019,
-            title={Parsimonious formulations for low-diameter clusters},
-            author={Salemi, Hosseinali and Buchanan, Austin },
-            year={2019},
-            note={Preprint available at \url{http://www.optimization-online.org/DB_HTML/2017/09/6196.html}}
-            } 
+           @article{salemi2020parsimonious,
+           title={Parsimonious formulations for low-diameter clusters},
+           author={Salemi, Hosseinali and Buchanan, Austin},
+           journal={Mathematical Programming Computation},
+           pages={1--36},
+           year={2020},
+           publisher={Springer}
+           } 
 
 
 Compiling the code
