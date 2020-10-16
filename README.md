@@ -5,10 +5,12 @@ This code accompanies the paper "Parsimonious formulations for low-diameter clus
            title={Parsimonious formulations for low-diameter clusters},
            author={Salemi, Hosseinali and Buchanan, Austin},
            journal={Mathematical Programming Computation},
-           pages={1--36},
+           volume={12},
+           number={3},
+           pages={493–528},
            year={2020},
            publisher={Springer}
-           } 
+           }
 
 
 Compiling the code
